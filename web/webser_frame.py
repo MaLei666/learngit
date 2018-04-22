@@ -48,8 +48,4 @@ def signin():
     return render_template('form.html',message='登录名或密码错误',username=username)
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    app.run()
-=======
-    app.run()
->>>>>>> 7bdc3e4d0424112eccdbd3565a53d77903206080
+
