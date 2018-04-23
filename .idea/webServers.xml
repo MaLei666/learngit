@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="1942f73e-d678-424b-a3b8-fe630b9e3276" name="237 (project level)" url="http://192.168.1.237">
+        <fileTransfer host="192.168.1.237" port="22" rootFolder="/home/zkyr/下载" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
