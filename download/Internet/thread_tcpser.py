@@ -1,23 +1,11 @@
 # -*- coding: utf-8 -*-
-<<<<<<< HEAD
-
-from socket import *
-from time import sleep
-from threading import Thread
-=======
 from socket import *
 from threading import Thread
 import binascii
->>>>>>> a12530e6a5567d7db75cb1c5aef536f10befce0b
 
 #处理客户端请求和数据
 def clideal(newsocket,cliaddr):
     while True:
-<<<<<<< HEAD
-        recvdata=newsocket.recv(1024)
-        if len(recvdata)>0:
-            print(str(cliaddr),recvdata)
-=======
         recvdata=binascii.b2a_hex((newsocket.recv(1024)))
         print(recvdata)
         # print('连接', str(cliaddr))             # '\n',' '.join(pattern.findall(recvdata)))
@@ -43,14 +31,11 @@ def clideal(newsocket,cliaddr):
             sendhex=binascii.a2b_hex(startSign+sumdata+checksum+enddata)
             print('返回',sendhex)
             newsocket.send(sendhex)
->>>>>>> a12530e6a5567d7db75cb1c5aef536f10befce0b
         else:
             print('close...')
             break
     newsocket.close()
 
-<<<<<<< HEAD
-=======
 def uchar_checksum(data, byteorder='little'):
 
     length = len(data)
@@ -68,22 +53,10 @@ def uchar_checksum(data, byteorder='little'):
     checksum=hex(checksum)
     checksum=checksum[-2:]
     return checksum
->>>>>>> a12530e6a5567d7db75cb1c5aef536f10befce0b
 
 def main():
     tcpsersocket=socket(AF_INET,SOCK_STREAM)
     tcpsersocket.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
-<<<<<<< HEAD
-    tcpseraddr=('192.168.0.203',8001)
-    tcpsersocket.bind(tcpseraddr)
-    tcpsersocket.listen(2)
-
-    try:   #try-finally 语句无论是否发生异常都将执行最后的代码。
-        while True:
-            print('main processing...')
-            newsocket,cliaddr=tcpsersocket.accept()
-            print('new processing to handle %s'%str(cliaddr))
-=======
     tcpseraddr=('192.168.43.51',8001)
     tcpsersocket.bind(tcpseraddr)
     tcpsersocket.listen(2)
@@ -91,7 +64,6 @@ def main():
         while True:
             newsocket,cliaddr=tcpsersocket.accept()
 
->>>>>>> a12530e6a5567d7db75cb1c5aef536f10befce0b
             client=Thread(target=clideal,args=(newsocket,cliaddr))  #创建新的线程处理客户端数据
             client.start()
 
@@ -99,10 +71,6 @@ def main():
         tcpsersocket.close()
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    main()
-
-=======
     main()# -*- coding: utf-8 -*-
 from socket import *
 from threading import Thread
@@ -177,4 +145,3 @@ def main():
 
 if __name__ == '__main__':
     main()
->>>>>>> a12530e6a5567d7db75cb1c5aef536f10befce0b
