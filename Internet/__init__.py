@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # -*- coding: utf-8 -*-
 
 # import socket
@@ -27,7 +27,7 @@ udpsocket.close()
 # udpsocket.sendto(bytes(senddata, encoding = "utf8"),sendaddr)
 
 
-=======
+
 #-*-coding:utf-8-*-
 from socket import *
 udpsocket=socket(AF_INET,SOCK_DGRAM)
@@ -43,5 +43,3 @@ while True:
     udpsocket.sendto(recvdata[0],recvdata[1])
 udpsocket.close()
 
-
->>>>>>> a12530e6a5567d7db75cb1c5aef536f10befce0b
