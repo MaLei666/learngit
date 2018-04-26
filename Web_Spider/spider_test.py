@@ -44,26 +44,50 @@ from urllib import error
 #     translate_results = translate_results['translateResult'][0][0]['tgt']   # 找到翻译结果
 #     print("翻译的结果是：%s" % translate_results)              # 打印翻译信息
 
+# if __name__ == '__main__':
+#     # URLError
+#     url='http://www.iloveyou.com/'                  #一个不存在的连接
+#     # HTTPError
+#     url = 'http://www.douyu.com/Jack.html'      #请求的资源没有在服务器上找到,www.douyu.com这个服务器是存在的，但是我们要查找的Jack.html资源是没有的
+#     req=request.Request(url)
+#     try:
+#         response=request.urlopen(req)
+#         # html=response.read().decode('utf-8')
+#         # print(html)
+#     # except error.URLError as e:
+#     #     print(e.reason)
+#     # except error.HTTPError as e:
+#     #     print(e.code)
+#     except error.URLError as e:
+#         if hasattr(e,'code'):
+#             print('httperror',e.code)
+#         elif hasattr(e,'reason'):
+#             print('urlerror',e.reason)
+
+
+# #User Agent
+# if __name__ == '__main__':
+#     url='http://www.csdn.net/'      #CSDN不更改User Agent是无法访问的
+#     #1. 填入headers参数
+#     # head={}                         #创建字典，写入参数
+#     # head['user_agent']='Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0'
+#     # req=request.Request(url,headers=head)       #创建Request对象
+#
+#     #2.创建完成之后,使用add_header()
+#     req=request.Request(url)
+#     req.add_header('User-Agent','Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0')
+#     response=request.urlopen(req)               #传入创建好的Request对象
+#     html=response.read().decode('utf-8')        #读取响应信息并解码
+#     print(html)
+
+#代理ip
 if __name__ == '__main__':
-    # URLError
-    url='http://www.iloveyou.com/'                  #一个不存在的连接
-    # HTTPError
-    url = 'http://www.douyu.com/Jack.html'      #请求的资源没有在服务器上找到,www.douyu.com这个服务器是存在的，但是我们要查找的Jack.html资源是没有的
-    req=request.Request(url)
-    try:
-        response=request.urlopen(req)
-        # html=response.read().decode('utf-8')
-        # print(html)
-    # except error.URLError as e:
-    #     print(e.reason)
-    # except error.HTTPError as e:
-    #     print(e.code)
-    except error.URLError as e:
-        if hasattr(e,'code'):
-            print('httperror',e.code)
-        elif hasattr(e,'reason'):
-            print('urlerror',e.reason)
-
-
-
-
+    url='http://www.whatismyip.com.tw/'
+    proxy={'http':'183.159.80.231:18118'}       #设置代理ip
+    proxy_support=request.ProxyHandler(proxy)   #创建ProxyHandler
+    opener=request.build_opener(proxy_support)  #创建opener
+    opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0')]
+    request.install_opener(opener)              #安装opener
+    response=request.urlopen(url)               #使用自己安装好的Opener
+    html=response.read().decode('utf-8')        #读取相应信息并解码
+    print(html)
