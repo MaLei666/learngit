@@ -69,13 +69,16 @@ if __name__ == '__main__':
                 download_html=download_response.read().decode('gbk','ignore')
                 #下载章节标题名为子节点标签内部文字
                 download_name=child.string
-                #创建beautifulsoup对象，
+                #创建beautifulsoup对象
                 soup_texts=BeautifulSoup(download_html,'lxml')
+                #搜索文档树，查找id为content，class为showtxt的对象
                 texts=soup_texts.find_all(id = 'content', class_ = 'showtxt')
+                #创建对象，保存过滤后的数据
                 soup_text=BeautifulSoup(str(texts),'lxml')
                 write_flag=True
                 file.write(download_name+'\n\n')
                 #爬取内容写入文件
+                #将\xa0无法解码的字符删除
                 for each in soup_text.div.text.replace('/xa0',''):
                     if each=='h':
                         write_flag=False
@@ -85,8 +88,7 @@ if __name__ == '__main__':
                         file.write('\n')
                 file.write('\n\n')
                 #打印爬取进度
-                print(sys.stdout.write('已下载：%.3f%%'%float(index/num)+'\r'))
-                sys.stdout.flush()
+                print('已下载：%.3f' % float(index/num)+'\r')
                 index+=1
     file.close()
 
