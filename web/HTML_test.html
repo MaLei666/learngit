@@ -15,12 +15,13 @@
             color: #101010;
             font-size:20px;
         }
-        .box1:hover{color:red}
+        .box1:hover{color:red;}
         .box2:before{content:'行首文字';}
         .box3:after{content:'行尾文字';}
 
-        .box01{width:400px;height:54px;background-color: #fff8f8;
-            border-top:1px solid #FF0000;border-bottom:3px solid #101010}
+        .box01{width:400px;height:54px;border-top:1px solid #FF0000;border-bottom:3px solid #101010;float: right;}
+        .box02{background:url(1.jpg) -110px -120px;}
+        .box03{width:400px;height:200px;border-top:1px solid #122e67;border-bottom:1px solid #122e67;}
     </style>
     <script>
         function change(){document.getElementsByTagName('h1')[0].style.color = '#ff0000';}
@@ -28,7 +29,7 @@
 </head>
 
 <body>
-    <a href="#mao1">指哪跳哪</a>  <!--  # 跳转到指定id标题处   -->
+    <a href="#mao1" title="真跳了啊">指哪跳哪</a>  <!--  # 跳转到指定id标题处   -->
     <meta charset="UTF-8">
     <h1 onclick="change()">
         Hello, world!
@@ -111,11 +112,19 @@
         <input type="submit" name="" value="提交">
         <input type="reset" name="" value="重置"> 	<!-- input类型为reset定义重置按钮  -->
     </p>
+    </form>
     <h3 id="mao1"><div style="color:red "></div>跳转到的标题</h3>
     <iframe src="http://www.baidu.com" frameborder="1" scrolling="yes" width="1320" height="329"></iframe>
-    </form>
+    <!-- 盒子  -->
+    <div class="box01"><h3>新闻列表</h3></div><br/>
+    <!-- 盒子中填充背景  -->
+    <div class="box03 box02"></div>
+    <!-- html内嵌框架  -->
+    <a href="HTML_test.html" target="frame">页面一</a>
+    <iframe src="HTML_test.html" frameborder="0" scrolling="no" name="frame"></iframe>
+    <!-- html内嵌框架  -->
 
-    <div class="box01"><h3>新闻列表</h3>></div><br/>
+
 
 </body>
 </html>
