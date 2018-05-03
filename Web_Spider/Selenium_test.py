@@ -54,7 +54,7 @@ from bs4 import BeautifulSoup
 # elem = browser.find_element_by_xpath('''//*[@id='form1']/span[@class="content_3_span"]''')
 # elem.click()
 
-#爬取百度文库
+#爬取百度文库，失败，what happened！
 browser=webdriver.ChromeOptions()
 browser.add_argument('user-agent="Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"')
 driver=webdriver.Chrome(chrome_options=browser)
