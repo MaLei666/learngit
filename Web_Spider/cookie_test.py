@@ -119,10 +119,10 @@ if __name__ == '__main__':
 
     #使用代理ip访问网址
     #使用代理ip，打开url
-    browser = webdriver.FirefoxOptions()
+    browser = webdriver.ChromeOptions()
     # browser.add_argument('--proxy-server=http://60.177.230.250:18118')
-    browser.add_argument('user-agent="Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"')
-    driver = webdriver.Firefox(firefox_options=browser)
+    browser.add_argument('user-agent="Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0"')
+    driver = webdriver.Chrome(chrome_options=browser)
     driver.maximize_window()
     driver.get('https://wenku.baidu.com/view/59d488ac85868762caaedd3383c4bb4cf7ecb783.html?from=search')
 
@@ -181,19 +181,19 @@ if __name__ == '__main__':
         print(class_page)
         write_flag = True
         # 跳转到打印好的页面,使下一页可以显示数据
-        # 无法正常滑动
+        # 无法正常滑动，到第5页滑动不了
         elem = driver.find_elements_by_xpath('''//*[@id="reader-container-inner-1"]//div[@class="ie-fix"]''')
         print(elem)
         driver.execute_script('arguments[0].scrollIntoView();', elem[-1])
-        time.sleep(1)
-        for i in download_text.div.text.replace('/xa0', ''):
-            if i == 'h':
-                write_flag = False
-            if write_flag == True and i != '':
-                file.write(i)
-            if write_flag == True and i == '\r':
-                file.write('\n')
-        file.write('\n\n')
+        # time.sleep(1)
+        # for i in download_text.div.text.replace('/xa0', ''):
+        #     if i == 'h':
+        #         write_flag = False
+        #     if write_flag == True and i != '':
+        #         file.write(i)
+        #     if write_flag == True and i == '\r':
+        #         file.write('\n')
+        # file.write('\n\n')
 
     file.close()
 
