@@ -4,6 +4,7 @@ from urllib import parse
 import json
 from urllib import error
 import chardet
+from selenium import webdriver
 
 # if __name__ == "__main__":
 #     # 向指定的url发送请求，并返回服务器响应的类文件对象
@@ -85,7 +86,7 @@ import chardet
 #代理ip
 if __name__ == '__main__':
     url='http://www.whatismyip.com.tw/'
-    proxy={'http':'182.112.202.243:8118'}       #设置代理ip
+    proxy={'http':'60.177.229.230:18118'}       #设置代理ip
     proxy_support=request.ProxyHandler(proxy)   #创建ProxyHandler
     opener=request.build_opener(proxy_support)  #创建opener
     opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0')]
@@ -93,3 +94,8 @@ if __name__ == '__main__':
     response=request.urlopen(url)               #使用自己安装好的Opener
     html=response.read().decode('utf-8')        #读取相应信息并解码
     print(html)
+    browser = webdriver.FirefoxOptions()
+
+    driver = webdriver.Firefox(firefox_options=browser)
+    driver.maximize_window()
+    driver.get(url=url)
