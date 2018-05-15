@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
-import requests,random,re,json,time,urllib
+import requests,random,re,time,os
 from urllib import request
-from selenium import webdriver
-from bs4 import BeautifulSoup
 from lxml import etree
 import subprocess as sp
 from selenium import webdriver
-from pyquery import pyquery as p
-# from pyExcelerator import *
-from urllib.parse import quote
 from bs4 import BeautifulSoup
-
 
 def get_proxys(page=1):
     #自动保持cookie,不需要自己维护cookie内容
@@ -34,7 +28,8 @@ def get_proxys(page=1):
     bf2=BeautifulSoup(str(bf1.find_all(id="ip_list")),'lxml')
     iplist=bf2.table.contents
     #存储代理列表
-    prolist=[]
+    global proxy_list
+    proxy_list=[]
     #爬取每个代理的信息
     for index in range(len(iplist)):
         #空行与有用数据交替，第一个元素为空行
@@ -43,9 +38,9 @@ def get_proxys(page=1):
             ip=dom.xpath('//td[2]')
             port=dom.xpath('//td[3]')
             protocol=dom.xpath('//td[6]')
-            prolist.append(protocol[0].text.lower()+'#'+ip[0].text+'#'+port[0].text)
+            proxy_list.append(protocol[0].text.lower()+'#'+ip[0].text+'#'+port[0].text)
+    return proxy_list
     #返回代理列表
-    return prolist
 
 '''
 检查代理ip连通性
@@ -95,42 +90,13 @@ def initpattern():
     wastetime=re.compile(u"平均 = (\d+)ms",re.IGNORECASE)
     return losetime,wastetime
 
-def proxy_choose():
-    # 初始化正则表达式
-    # losetime, wastetime = initpattern()
-    # 获取ip代理列表
-    proxy_list = get_proxys(1)
-    # # 如果平均时间超过200ms，重新选择代理
-    # while True:
-    #     # 从100个ip中随机选取一个ip作为代理访问
-    #     proxy = random.choice(proxy_list)
-    #     split_proxy = proxy.split('#')
-    #     # 获取ip
-    #     ip = split_proxy[1]
-    #     # 检查ip
-    #     average_time = check_ip(ip, losetime, wastetime)
-    #     if average_time > 200:
-    #         # 去掉不能使用的ip
-    #         print(ip, '连接失败，重新获取')
-    #         proxy_list.remove(proxy)
-    #     if average_time < 200:
-    #         break
-    # # 去掉已经使用的ip
-    proxy=proxylist()[1]
-    proxy_list.remove(proxy)
-    # proxy_dict = {split_proxy[1] + ':' + split_proxy[2]}
-    # proxy_ip = str(split_proxy[1] + ':' + split_proxy[2])
-    # # print(proxy_ip)
-    # print('使用代理：', proxy_dict)
-    return proxy_list
-
 def proxylist():
     losetime, wastetime = initpattern()
-    proxy_list=proxy_choose()
+    # proxy_list=proxy_choose()
     while True:
+        global proxy_list
         if len(proxy_list)<=20:
-            proxy_choose()
-            proxy_list = list(proxy_choose())
+            proxy_list = get_proxys(1)
         else:
             # 从代理ip池中随机选取一个ip作为代理访问
             proxy = random.choice(proxy_list)
@@ -138,7 +104,7 @@ def proxylist():
             # 获取ip
             ip = split_proxy[1]
             port=int(split_proxy[2])
-            # 检查ip
+            # 检查ip连通性
             average_time = check_ip(ip, losetime, wastetime)
             if average_time > 200:
                 # 去掉不能使用的ip
@@ -149,7 +115,7 @@ def proxylist():
     # 去掉已经使用的ip
     proxy_list.remove(proxy)
     proxy_dict = {split_proxy[1] + ':' + split_proxy[2]}
-    print('使用代理：', proxy_dict,len(proxy_list))
+    print('使用代理：', proxy_dict,'代理池剩余ip',len(proxy_list))
 
     # 使用代理ip访问网址
     # 谷歌浏览器设置代理ip
@@ -169,36 +135,33 @@ def proxylist():
     profile.set_preference('network.proxy.http_port', port)
     profile.set_preference('network.proxy.ssl', ip)
     profile.set_preference('network.proxy.ssl_port', port)
+
+    # profile.set_preference('network.proxy.http', '1.199.210.95')
+    # profile.set_preference('network.proxy.http_port', 61234)
+    # profile.set_preference('network.proxy.ssl', '1.199.210.95')
+    # profile.set_preference('network.proxy.ssl_port', 61234)
+
     profile.update_preferences()
     driver = webdriver.Firefox(profile)
-    return driver,proxy
+    return driver
 
 #判断是否为错误网页
 def falsepage():
-    b = choose_ip()
-    if b == True:
-        #如果为错误网页，从代理ip池中随机选择一个，换代理后重新打开网页
-        proxylist()
-        driver.get(URL)
-
-
-
-
-#验证码识别
-#先写个手动识别吧……emm……写完代码再搞自动识别吧……嘤嘤嘤…………
-def checknum():
-    num=input('输入验证码:')
-    number=driver.find_element_by_name('c')
-    number.send_keys(num)
-    time.sleep(1)
-    enter=driver.find_element_by_xpath('''//*[@class="p5"]/a[@id="submit"]''')
-    enter.click()
+    try:
+        # URL = ('http://weixin.sogou.com/')
+        driver.get(url=URL)
+        time.sleep(3)
+        b = False
+    except:
+        # 判断是否为错误网页
+        driver.find_element_by_id('errorPageContainer')
+        b = True
+    return b
 
 #搜索公众号
 def searchnum():
     # 获取输入框，输入英文微信公众号，搜索显示
     elem1_value = driver.find_element_by_name('query')
-    time.sleep(1)
     elem1_value.send_keys('python6359')
     time.sleep(1)
     elem2 = driver.find_element_by_xpath('''//*[@class="querybox"]/input[@class="swz2"]''')
@@ -206,44 +169,110 @@ def searchnum():
 
 #进入公众号
 def mainpage():
-    mainpage=driver.find_element_by_xpath('''//div[@class="txt-box"]//a[@target="_blank"]''')
+    time.sleep(2)
+    mainpage=driver.find_element_by_xpath('''//*[@class="tit"]/a[1]''')
     mainpage.click()
+    time.sleep(10)
 
-#爬取文章
-def text_download():
-    #标题
-    title=driver.find_elements_by_class_name('weui_media_title')
-    #发表时间
-    time_updata=driver.find_elements_by_class_name('weui_media_extra_info')
-    #标题对应地址
-    artical_url=driver.find_elements_by_xpath('''//h4[@class="weui_media_title"]''')
-    # artical_url.click()
-    print(title,time_updata,artical_url)
-    #文章内容
-    #存储文章到本地
+    # 点击公众号，有可能出现验证码界面，页面为新跳转的页面
+    handles = driver.window_handles
+    driver.switch_to_window(handles[1])
+    print(handles)
+    time.sleep(3)
+
+    #判断是否为验证码界面
+    try:
+        driver.find_element_by_id('verify_change')
+        a = True
+    except:
+        a = False
+
+    # 如果有这个元素，则出现了验证码界面
+    if a == True:
+        num = input('输入验证码:')
+        number = driver.find_element_by_id('input')
+        number.send_keys(num)
+
+        time.sleep(3)
+        enter = driver.find_element_by_xpath('''//*[@class="weui_btn_area btn_box"]/a[@id="bt"]''')
+        enter.click()
+    elif a == False:
+        time.sleep(1)
+
 
 #如果出现代理服务器拒绝连接，从ip池随机选择一个ip
-def choose_ip():
-    try:
-        driver.find_element_by_id('errorPageContainer')
-        b=True
-    except:
-        b=False
-    return b
+def download():
+    # 下载文章
+    page_source = driver.page_source
+    listmain_soup = BeautifulSoup(page_source, 'lxml')
+    qunfa = listmain_soup.find_all('div', class_="weui_msg_card_list")
+    qunfa_list = BeautifulSoup(str(qunfa), 'lxml')
+    # print(qunfa_list)
+    page_title = []
+    page_time = []
+    page_url = []
+    # 创建文件夹
+    # file=open('python6359.txt','w',encoding='utf-8')
+    os.mkdir('python6359')
+    os.getcwd()
+    os.chdir(r'E:\example\微信公众号爬虫\python6359')
+    os.getcwd()
 
+    for child in qunfa_list.div.children:
+        if child != '\n':
+            # print(child.find('h4',class_="weui_media_title").string)
+            page_title.append(
+                str(child.find('h4', class_="weui_media_title").string).replace('\n', '').replace(' ', ''))
+            page_time.append(child.find('p', class_="weui_media_extra_info").string)
+            # 爬取，同时拼接URL
+            page_url.append('https://mp.weixin.qq.com' + (child.h4.get('hrefs')))
+    print(page_title, '\n', page_time, '\n', page_url)
+    # 进入每个URL爬取文章
+    for i in range(0, 10):
+        file = open(page_title[i] + '.doc', 'w', encoding='utf-8')
+        file.write(page_title[i] + '\n')
+        file.write(page_time[i] + '\n')
 
+        download_req = request.Request(url=page_url[i])
+        download_res = request.urlopen(download_req)
+        download_html = download_res.read().decode('utf-8')
+        soup_texts = BeautifulSoup(download_html, 'lxml')
+        texts = soup_texts.find_all(id='js_content', class_='rich_media_content ')
+        soup_text = BeautifulSoup(str(texts), 'lxml').text
+        # write_flag = True
+        soup_text = str(soup_text).replace('。', '\n')
+        file.write(str(soup_text))
+        # for each in soup_text.text.replace('/xa0',''):
+        #     if each == 'h':
+        #         write_flag = False
+        #     if write_flag == True and each != '':
+        #         file.write(each)
+        #     if write_flag == True and each == '\r':
+        #         file.write('\n')
+        file.write('\n\n')
+        file.close()
 
 if __name__ == '__main__':
     URL = ('http://weixin.sogou.com/')
+    #定义代理ip池列表
+    proxy_list=[]
     # URL=('http://www.whatismyip.com.tw/')
     # 使用代理ip打开网页
-    driver=proxylist()[0]
-    driver.get(URL)
-    time.sleep(2)
-
+    driver=proxylist()
     #判断是否为错误网页
-    falsepage()
-
+    b=falsepage()
+    while True:
+        if b == True:
+            time.sleep(1)
+            driver.quit()
+            #代理池中抽取ip
+            driver=proxylist()
+            falsepage()
+            if b==False:
+                break
+        elif b==False:
+            break
+    searchnum()
     # 查看本机ip
     # driver.get("http://httpbin.org/ip")
     # driver.maximize_window()
@@ -258,27 +287,34 @@ if __name__ == '__main__':
         a=False
     #如果有这个元素，则出现了验证码界面
     if a==True:
-        checknum()
-        time.sleep(1)
+        # 验证码识别
+        # 先写个手动识别吧……emm……写完代码再搞自动识别吧……嘤嘤嘤…………
+        num = input('输入验证码:')
+        number = driver.find_element_by_name('c')
+        number.send_keys(num)
+        time.sleep(3)
+        enter = driver.find_element_by_xpath('''//*[@class="p5"]/a[@id="submit"]''')
+        enter.click()
+        time.sleep(2)
         mainpage()
+        # 判断是否验证码输错
+        # try:
+        #     driver.find_element_by_name('c')
+        #     a = True
+        # except:
+        #     a = False
+        # if a == True:
+        #     checknum()
+        #     time.sleep(1)
+        # elif a == False:
+        #     time.sleep(2)
+        #     mainpage()
+        #     time.sleep(2)
     #如果没有这个元素，则直接出现了公众号列表
     elif a==False:
+        time.sleep(2)
         mainpage()
-
-    #进入公众号列表后，有可能出现验证码界面
-    try:
-        driver.find_element_by_id('input')
-        a = True
-    except:
-        a = False
-    # 如果有这个元素，则出现了验证码界面
-    if a == True:
-        checknum()
-        time.sleep(1)
-        text_download()
-    elif a == False:
-        time.sleep(1)
-        text_download()
+    download()
 
 
 
@@ -286,20 +322,3 @@ if __name__ == '__main__':
 
 
 
-
-
-    # #获取公众号主页
-    # mainpage=driver.find_element_by_xpath('''//*[@class="tit"]/a[@target="_blank"]''')
-    # mainpage.click()
-    # timeout=5
-    # s=requests.Session()
-    # #Excel第一行数据
-    # excel_data=[u'编号',u'时间',u'文章标题',u'文章地址',u'文章简介']
-    # #定义Excel操作句柄
-    # # self.excel_w=Workbook()
-
-    # # 搜索入口地址，搜索公众号,获取主页
-    # response = s.get(url=sogou_search, headers=headers, timeout=timeout,ip=proxy_dict)
-    # html = response.text
-    # bf1 = BeautifulSoup(html, 'lxml')
-    # print(bf1)
