@@ -148,7 +148,6 @@ def proxylist():
 #判断是否为错误网页
 def falsepage():
     try:
-        # URL = ('http://weixin.sogou.com/')
         driver.get(url=URL)
         time.sleep(3)
         b = False
@@ -240,7 +239,7 @@ def download():
         texts = soup_texts.find_all(id='js_content', class_='rich_media_content ')
         soup_text = BeautifulSoup(str(texts), 'lxml').text
         # write_flag = True
-        soup_text = str(soup_text).replace('。', '\n')
+        soup_text = str(soup_text).replace('。', '\n\n')
         file.write(str(soup_text))
         # for each in soup_text.text.replace('/xa0',''):
         #     if each == 'h':
@@ -251,6 +250,7 @@ def download():
         #         file.write('\n')
         file.write('\n\n')
         file.close()
+    driver.quit()
 
 if __name__ == '__main__':
     URL = ('http://weixin.sogou.com/')
@@ -260,19 +260,20 @@ if __name__ == '__main__':
     # 使用代理ip打开网页
     driver=proxylist()
     #判断是否为错误网页
-    b=falsepage()
+    c=falsepage()
     while True:
-        if b == True:
+        if c == True:
             time.sleep(1)
             driver.quit()
-            #代理池中抽取ip
+            #代理池中抽取ip，driver更新
             driver=proxylist()
-            falsepage()
-            if b==False:
+            c=falsepage()
+            if c == False:
                 break
-        elif b==False:
+        elif c == False:
             break
     searchnum()
+    time.sleep(2)
     # 查看本机ip
     # driver.get("http://httpbin.org/ip")
     # driver.maximize_window()
@@ -288,14 +289,7 @@ if __name__ == '__main__':
     #如果有这个元素，则出现了验证码界面
     if a==True:
         # 验证码识别
-        # 先写个手动识别吧……emm……写完代码再搞自动识别吧……嘤嘤嘤…………
-        num = input('输入验证码:')
-        number = driver.find_element_by_name('c')
-        number.send_keys(num)
-        time.sleep(3)
-        enter = driver.find_element_by_xpath('''//*[@class="p5"]/a[@id="submit"]''')
-        enter.click()
-        time.sleep(2)
+        time.sleep(10)
         mainpage()
         # 判断是否验证码输错
         # try:
@@ -315,6 +309,7 @@ if __name__ == '__main__':
         time.sleep(2)
         mainpage()
     download()
+
 
 
 
