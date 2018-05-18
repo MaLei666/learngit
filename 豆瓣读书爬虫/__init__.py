@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests,time,pymysql,re,random
 from bs4 import BeautifulSoup
-
+pymysql.install_as_MySQLdb()
+from selenium import webdriver
 
 
 
@@ -20,7 +21,13 @@ from bs4 import BeautifulSoup
 #     cookie.save(ignore_discard=True,ignore_expires=True)
 
 #连接数据库
-connection=pymysql.connect(host='localhost',user='root',password='zkyr1006',charset='utf8')
+connection=pymysql.connect(host='localhost',
+        port=3306,
+        user='root',
+        passwd='zkyr1006',
+        db='python',
+        charset='utf8'  )
+
 with connection.cursor() as cursor:
     sql = "USE python;"
     cursor.execute(sql)
@@ -36,8 +43,8 @@ def login(url):
         for line in raw_cookies.split(';'):
             key,value=line.split('=',1)
             cookies[key]=value
-    proxie = {'http': 'http://14.118.254.31:6666'}
-    headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'}
+    proxie = {'http': 'http://125.64.17.100:808'}
+    headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'}
     res=s.get(url=url,cookies=cookies,headers=headers,proxies=proxie)
     return res
 
@@ -66,7 +73,7 @@ def sorturl():
 #爬取书籍详细信息
 def book_info():
     urls=sorturl()
-    #每个进入每个分类的书籍列表
+    #进入每个分类的书籍列表
     for url in urls:
         #存放每一本书的数据
         data=[]
@@ -78,26 +85,83 @@ def book_info():
         for book in books:
             book_url=book.get('href')
             book_data=login(book_url)
+
             booksoup=BeautifulSoup(book_data.text.encode('utf-8'),'lxml')
+
             info=booksoup.select('#info')  #select返回为列表
-            infos = list(info[0].strings)
-            infos=list(infos[0].replace('\n','')
-            title=booksoup.select('#wrapper > h1 > span')[0].string.replace('\n','')
-            author=booksoup.select('#info > a')[0].string.replace('\n','')
-            money = infos[infos.index('定价：') + 1]
-            # index输出关键字在字符串中出现的位置，从0开始
-            publish=infos[infos.index('出版社：')+1] #输出出版社后面的一个字符串，为出版公司
-            pages=infos[infos.index('页数：')+1]
-            years = infos[infos.index('出版年：') + 1]
-            ISBN = infos[infos.index('ISBN：') + 1]
-            people=booksoup.select('#interest_sectl > div > div > div > div > span > a > span')[0].get_text
-            score=booksoup.select('#interest_sectl > div > div > strong')[0].get_text
-            data.append([title,author,money,publish,pages,years,ISBN,people,score])
-        #存入数据库
+            #将返回的列表做处理
+            if len(info)!=0:
+                infos = list(info[0].strings)
+                for i in range(len(infos)):
+                    infos[i]=infos[i].replace(' ','').replace('\n','').replace('\xa0','')
+                for each in infos:
+                    if each=='':
+                        infos.remove('')
+                # print(infos)
+                try:
+                    title=booksoup.select('#wrapper > h1 > span')[0].string.replace('\n','')
+                    author=booksoup.select('#info > a')[0].string.replace(' ','').replace('\n','')
+                    money = infos[infos.index('定价:') + 1]
+                    # index输出关键字在字符串中出现的位置，从0开始
+                    try:
+                        publish=infos[infos.index('出版社:')+1] #输出出版社后面的一个字符串，为出版公司
+                    except:
+                        publish=''
+                    try:
+                        pages = infos[infos.index('页数:') + 1]
+                    except:
+                        pages=''
+                    try:
+                        years = infos[infos.index('出版年:') + 1]
+                    except:
+                        years=''
+                    try:
+                        ISBN = infos[infos.index('ISBN:') + 1]
+                    except:
+                        ISBN=''
+                    try:
+                        people = booksoup.select('#interest_sectl > div > div > div > div > span > a > span')[0].string
+                    except:
+                        people=''
+                    try:
+                        score = booksoup.select('#interest_sectl > div > div > strong')[0].string
+                    except:
+                        score=''
+                except:
+                    title = booksoup.select('#wrapper > h1 > span')[0].string.replace('\n', '')
+                    try:
+                        author = booksoup.select('#info > span > a')[0].string.replace(' ', '').replace('\n', '')
+                    except:
+                        author=''
+                    money = infos[infos.index('定价:') + 1]
+                    # index输出关键字在字符串中出现的位置，从0开始
+                    publish = infos[infos.index('出版社:') + 1]  # 输出出版社后面的一个字符串，为出版公司
+                    try:
+                        pages = infos[infos.index('页数:') + 1]
+                    except:
+                        pages=''
+                    years = infos[infos.index('出版年:') + 1]
+                    ISBN = infos[infos.index('ISBN:') + 1]
+                    try:
+                        people = booksoup.select('#interest_sectl > div > div > div > div > span > a > span')[0].string
+                    except:
+                        people=''
+                    try:
+                        score = booksoup.select('#interest_sectl > div > div > strong')[0].string
+                    except:
+                        score=''
+
+                eachdata=[title,author,money,publish,pages,years,ISBN,people,score]
+                print(eachdata)
+                data.append(eachdata)
+            elif len(info) == 0:
+                print('没有数据')
+            else:
+                print('未知错误')
+            #存入数据库,过滤重复信息
         with connection.cursor() as cursor:
-            sql = '''INSERT INTO douban_books (
-        title,author,money,publish,pages,years,ISBN,people,score)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+            sql = '''INSERT IGNORE INTO douban_books (title,author,money,publish,pages,years,ISBN,people,score)
+             values (%s,%s,%s,%s,%s,%s,%s,%s,%s)on duplicate key update title=values(title)'''
             cursor.executemany(sql, data)
             connection.commit()
             del data
@@ -109,7 +173,7 @@ book_info()
 end = time.clock()
 with connection.cursor() as cursor:
     print("Time Usage:", end -start)
-    count = cursor.execute('SELECT * FROM allbooks')
+    count = cursor.execute('SELECT * FROM douban_books')
     print("Total of books:", count)
 
 if connection.open:

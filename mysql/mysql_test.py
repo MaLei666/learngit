@@ -49,11 +49,11 @@ cursor=conn.cursor()
 #数据库中查询
 #a="select * from people_data"  #查询全部
 #a="select name,age from people_data"  #查询指定列
-#a='select distinct * from people_data'  # 使用distinct可以消除重复的行
+a='select distinct * from douban_books'  # 使用distinct可以消除重复的行
 #a="select * from people_data where name !='钟汉良' and age<30"   #按条件查询
 #a="select * from people_data where name like '钟%'"    #模糊查询
 # a="select * from people_data where age between 20 and 30"  #范围查询
-a="select * from people_data where age is null "   #判空
+# a="select * from people_data where age is null "   #判空
 
 cursor.execute(a)
 print(cursor.rowcount)  #打印执行结果的条数

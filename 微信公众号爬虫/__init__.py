@@ -222,6 +222,7 @@ def download():
             # print(child.find('h4',class_="weui_media_title").string)
             page_title.append(
                 str(child.find('h4', class_="weui_media_title").string).replace('\n', '').replace(' ', ''))
+
             page_time.append(child.find('p', class_="weui_media_extra_info").string)
             # 爬取，同时拼接URL
             page_url.append('https://mp.weixin.qq.com' + (child.h4.get('hrefs')))
