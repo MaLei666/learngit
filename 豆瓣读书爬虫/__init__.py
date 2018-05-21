@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
-import requests,time,pymysql,re,random
+import requests,time,pymysql,re,random,xlwt
 from bs4 import BeautifulSoup
 pymysql.install_as_MySQLdb()
 from selenium import webdriver
 
+# 连接数据库
+connection = pymysql.connect(host='localhost',
+                             port=3306,
+                             user='root',
+                             passwd='zkyr1006',
+                             db='python',
+                             charset='utf8')
 
+with connection.cursor() as cursor:
+    sql = "USE python;"
+    cursor.execute(sql)
+connection.commit()
 
 # def cookie_get():
 #     #保存cookie到文件
@@ -20,18 +31,6 @@ from selenium import webdriver
 #     # ignore_expires的意思是如果在该文件中cookies已经存在，则覆盖原文件写入
 #     cookie.save(ignore_discard=True,ignore_expires=True)
 
-#连接数据库
-connection=pymysql.connect(host='localhost',
-        port=3306,
-        user='root',
-        passwd='zkyr1006',
-        db='python',
-        charset='utf8'  )
-
-with connection.cursor() as cursor:
-    sql = "USE python;"
-    cursor.execute(sql)
-connection.commit()
 
 
 def login(url):
@@ -43,8 +42,8 @@ def login(url):
         for line in raw_cookies.split(';'):
             key,value=line.split('=',1)
             cookies[key]=value
-    proxie = {'http': 'http://125.64.17.100:808'}
-    headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'}
+    proxie = {'http': 'http://112.228.161.185:8118'}
+    headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'}
     res=s.get(url=url,cookies=cookies,headers=headers,proxies=proxie)
     return res
 
@@ -103,8 +102,25 @@ def book_info():
                     author=booksoup.select('#info > a')[0].string.replace(' ','').replace('\n','')
                     money = infos[infos.index('定价:') + 1]
                     # index输出关键字在字符串中出现的位置，从0开始
+                    publish=infos[infos.index('出版社:')+1] #输出出版社后面的一个字符串，为出版公司
+                    pages = infos[infos.index('页数:') + 1]
+                    years = infos[infos.index('出版年:') + 1]
+                    ISBN = infos[infos.index('ISBN:') + 1]
+                    people = booksoup.select('#interest_sectl > div > div > div > div > span > a > span')[0].string
+                    score = booksoup.select('#interest_sectl > div > div > strong')[0].string
+                except:
+                    title = booksoup.select('#wrapper > h1 > span')[0].string.replace('\n', '')
                     try:
-                        publish=infos[infos.index('出版社:')+1] #输出出版社后面的一个字符串，为出版公司
+                        author = booksoup.select('#info > span > a')[0].string.replace(' ', '').replace('\n', '')
+                    except:
+                        author=''
+                    try:
+                        money = infos[infos.index('定价:') + 1]
+                    except:
+                        money=''
+                    # index输出关键字在字符串中出现的位置，从0开始
+                    try:
+                        publish = infos[infos.index('出版社:') + 1]  # 输出出版社后面的一个字符串，为出版公司
                     except:
                         publish=''
                     try:
@@ -127,29 +143,6 @@ def book_info():
                         score = booksoup.select('#interest_sectl > div > div > strong')[0].string
                     except:
                         score=''
-                except:
-                    title = booksoup.select('#wrapper > h1 > span')[0].string.replace('\n', '')
-                    try:
-                        author = booksoup.select('#info > span > a')[0].string.replace(' ', '').replace('\n', '')
-                    except:
-                        author=''
-                    money = infos[infos.index('定价:') + 1]
-                    # index输出关键字在字符串中出现的位置，从0开始
-                    publish = infos[infos.index('出版社:') + 1]  # 输出出版社后面的一个字符串，为出版公司
-                    try:
-                        pages = infos[infos.index('页数:') + 1]
-                    except:
-                        pages=''
-                    years = infos[infos.index('出版年:') + 1]
-                    ISBN = infos[infos.index('ISBN:') + 1]
-                    try:
-                        people = booksoup.select('#interest_sectl > div > div > div > div > span > a > span')[0].string
-                    except:
-                        people=''
-                    try:
-                        score = booksoup.select('#interest_sectl > div > div > strong')[0].string
-                    except:
-                        score=''
 
                 eachdata=[title,author,money,publish,pages,years,ISBN,people,score]
                 print(eachdata)
@@ -158,23 +151,84 @@ def book_info():
                 print('没有数据')
             else:
                 print('未知错误')
-            #存入数据库,过滤重复信息
-        with connection.cursor() as cursor:
-            sql = '''INSERT IGNORE INTO douban_books (title,author,money,publish,pages,years,ISBN,people,score)
-             values (%s,%s,%s,%s,%s,%s,%s,%s,%s)on duplicate key update title=values(title)'''
-            cursor.executemany(sql, data)
-            connection.commit()
-            del data
-            time.sleep(random.randint(0, 9))  # 防止IP被封
+            #存入数据库
+        try:
+            with connection.cursor() as cursor:
+                sql = '''INSERT IGNORE INTO douban_books (title,author,money,publish,pages,years,ISBN,people,score)
+                 values (%s,%s,%s,%s,%s,%s,%s,%s,%s)on duplicate key update title=values(title)'''
+                cursor.executemany(sql, data)
+                connection.commit()
+                del data
+                time.sleep(random.randint(0, 9))  # 防止IP被封
+        except:
+            continue
+
+        #程序运行时间太长，规定数据库条数，迅速看到结果
+        cursor = connection.cursor()
+        count = cursor.execute('select * from douban_books')
+        if count>=60:
+            break
+
+def export(table_name):
+    cursor = connection.cursor()
+    count = cursor.execute('select * from '+table_name)
+    # print(self._cursor.lastrowid)
+    print(count)
+    # 重置游标的位置
+    cursor.scroll(0, mode='absolute')
+    # 搜取所有结果
+    results = cursor.fetchall()
+
+    # 获取MYSQL里面的数据字段名称
+    fields = cursor.description
+    workbook = xlwt.Workbook(encoding = 'uft-8')
+
+    # 注意: 在add_sheet时, 置参数cell_overwrite_ok=True, 可以覆盖原单元格中数据。
+    # cell_overwrite_ok默认为False, 覆盖的话, 会抛出异常.
+    sheet = workbook.add_sheet('table_'+table_name, cell_overwrite_ok=True)
+
+    # 写上字段信息
+    for field in range(0, len(fields)):
+        sheet.write(0, field, fields[field][0])
+
+    # 获取并写入数据段信息
+    row = 1
+    col = 0
+    for row in range(1,len(results)+1):
+        for col in range(0, len(fields)):
+            sheet.write(row, col, u'%s' % results[row-1][col])
+    workbook.save(table_name+'.xls')
 
 
 start = time.clock()
+# 获取书籍信息，存入数据库
 book_info()
+#删除重复数据，并且重新排序
+cursor = connection.cursor()
+a='''delete from douban_books where id in (select id from (select id from douban_books where id not in (select min(id) from douban_books group by title)) as temple);'''
+cursor.execute(a)
+connection.commit()
+# 删除原有主键：
+a='''ALTER  TABLE  `douban_books` DROP `id`;'''
+cursor.execute(a)
+connection.commit()
+# 添加新主键字段：
+a='''ALTER  TABLE  `douban_books` ADD `id` MEDIUMINT( 8 ) NOT NULL  FIRST;'''
+cursor.execute(a)
+connection.commit()
+# 设置新主键：
+a='''ALTER  TABLE  `douban_books` MODIFY COLUMN  `id` MEDIUMINT( 8 ) NOT NULL  AUTO_INCREMENT,ADD PRIMARY  KEY(id)'''
+cursor.execute(a)
+connection.commit()
+
 end = time.clock()
 with connection.cursor() as cursor:
     print("Time Usage:", end -start)
     count = cursor.execute('SELECT * FROM douban_books')
     print("Total of books:", count)
+
+
+export('douban_books')
 
 if connection.open:
     connection.close()

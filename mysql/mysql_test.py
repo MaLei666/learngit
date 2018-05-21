@@ -49,23 +49,40 @@ cursor=conn.cursor()
 #数据库中查询
 #a="select * from people_data"  #查询全部
 #a="select name,age from people_data"  #查询指定列
-a='select distinct * from douban_books'  # 使用distinct可以消除重复的行
+# a='select distinct * from douban_books'  # 使用distinct可以消除重复的行
 #a="select * from people_data where name !='钟汉良' and age<30"   #按条件查询
 #a="select * from people_data where name like '钟%'"    #模糊查询
 # a="select * from people_data where age between 20 and 30"  #范围查询
 # a="select * from people_data where age is null "   #判空
-
+#删除重复数据
+a='''delete from douban_books where id in (select id from (select id from douban_books where id not in (select min(id) from douban_books group by title)) as temple);'''
 cursor.execute(a)
-print(cursor.rowcount)  #打印执行结果的条数
-rr=cursor.fetchall()
-for i in rr:
-    print(i)
-
-#修改数据
-#cursor.execute("UPDATE people_data SET age='38',birthday='1980-11-14' WHERE name='乔振宇'")
-
-#提交到数据库执行
 conn.commit()
+# 删除原有主键：
+a='''ALTER  TABLE  `douban_books` DROP `id`;'''
+cursor.execute(a)
+conn.commit()
+# 添加新主键字段：
+a='''ALTER  TABLE  `douban_books` ADD `id` MEDIUMINT( 8 ) NOT NULL  FIRST;'''
+cursor.execute(a)
+conn.commit()
+# 设置新主键：
+a='''ALTER  TABLE  `douban_books` MODIFY COLUMN  `id` MEDIUMINT( 8 ) NOT NULL  AUTO_INCREMENT,ADD PRIMARY  KEY(id)'''
+cursor.execute(a)
+conn.commit()
+
+# cursor.execute(a)
+# print(cursor.rowcount)  #打印执行结果的条数
+# rr=cursor.fetchall()
+# for i in rr:
+#     print(i)
+#
+# #修改数据
+# #cursor.execute("UPDATE people_data SET age='38',birthday='1980-11-14' WHERE name='乔振宇'")
+#
+# #提交到数据库执行
+# conn.commit()
+
 # 关闭数据库连接，关闭游标
 conn.close()
 cursor.close()
