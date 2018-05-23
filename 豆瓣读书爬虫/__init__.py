@@ -148,9 +148,9 @@ def book_info():
                 print(eachdata)
                 data.append(eachdata)
             elif len(info) == 0:
-                print('没有数据')
+                continue
             else:
-                print('未知错误')
+                continue
             #存入数据库
         try:
             with connection.cursor() as cursor:
@@ -164,10 +164,10 @@ def book_info():
             continue
 
         #程序运行时间太长，规定数据库条数，迅速看到结果
-        cursor = connection.cursor()
-        count = cursor.execute('select * from douban_books')
-        if count>=60:
-            break
+        # cursor = connection.cursor()
+        # count = cursor.execute('select * from douban_books')
+        # if count>=60:
+        #     break
 
 def export(table_name):
     cursor = connection.cursor()
