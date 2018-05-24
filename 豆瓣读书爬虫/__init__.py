@@ -12,9 +12,9 @@ connection = pymysql.connect(host='localhost',
                              db='python',
                              charset='utf8')
 
-with connection.cursor() as cursor:
-    sql = "USE python;"
-    cursor.execute(sql)
+cursor=connection.cursor
+sql = "USE python;"
+cursor.execute(sql)
 connection.commit()
 
 # def cookie_get():

@@ -77,4 +77,16 @@
 #
 #
 #
+import re
+def to_camel_case(text):
+    try:
+        text=re.split(r'[\W \\_]',text)
+        Text=''
+        for i in text[1:]:
+            i=i[0:1].upper()+i[1:]
+            Text=Text+i
+        return text[0]+Text
+    except:
+        return ''
 
+to_camel_case('the_stealth_warrior')
