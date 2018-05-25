@@ -77,16 +77,84 @@
 #
 #
 #
-import re
-def to_camel_case(text):
-    try:
-        text=re.split(r'[\W \\_]',text)
-        Text=''
-        for i in text[1:]:
-            i=i[0:1].upper()+i[1:]
-            Text=Text+i
-        return text[0]+Text
-    except:
-        return ''
+# import smtplib
+# # import email.mime.multipart
+# from email.header import Header
+# import email.mime.text
+# from email.mime.text import MIMEText
 
-to_camel_case('the_stealth_warrior')
+# msg = email.mime.multipart.MIMEMultipart()
+# msgFrom = '826908021@qq.com' #从该邮箱发送
+# msgTo = '799960740@qq.com' #发送到该邮箱
+# smtpSever='smtp.163.com' # qq邮箱的smtp Sever地址
+# smtpPort = '465' #开放的端口
+# sqm='jtomjlibaioqbdch'  # 在登录smtp时需要login中的密码应当使用授权码而非账户密码
+#
+# msg['from'] = msgFrom
+# msg['to'] = msgTo
+# msg['subject'] = 'Python自动邮件-'#+dataNumber
+# content = '''
+# 你好:
+#     这是一封python3发送的邮件
+# '''
+# txt = email.mime.text.MIMEText(content)
+# msg.attach(txt)
+# # smtp = smtplib
+# smtp = smtplib.SMTP()
+# '''
+# smtplib的connect（连接到邮件服务器）、login（登陆验证）、sendmail（发送邮件）
+# '''
+# smtp.connect(smtpSever, smtpPort)
+# smtp.login(msgFrom, sqm)
+# smtp.sendmail(msgFrom, msgTo, str(msg))
+# # s = smtplib.SMTP("localhost")
+# # s.send_message(msg)
+# smtp.quit()
+
+
+
+# def sendmail(subject, content):
+#     email_host = 'smtp.qq.com'     # 发送者是163邮箱
+#     email_user = '826908021@qq.com'  # 发送者账号
+#     email_pwd = 'jtomjlibaioqbdch'       # 发送者密码
+#     maillist ='799960740@qq.com'    # 接收者账号，本来想写成[]list的，但是报错，还没解决！
+#     # 三个参数：第一个为文本内容，第二个 html 设置文本格式，第三个 utf-8 设置编码
+#     msg = email.mime.text.MIMEText(content, 'html', 'utf-8')    # 邮件内容
+#     msg['Subject'] = subject    # 邮件主题
+#     msg['From'] = email_user    # 发送者账号
+#     msg['To'] = maillist    # 接收者账号
+#
+#     smtp = smtplib.SMTP(email_host) # 如上变量定义的，是163邮箱
+#     smtp.login(email_user, email_pwd)   # 发送者的邮箱账号，密码
+#     smtp.sendmail(email_user, maillist, str(msg))    # 参数分别是发送者，接收者，第三个不知道
+#     smtp.quit() # 发送完毕后退出smtp
+#     print ('email send success.')
+#
+#
+# sendmail('test', 'aaa')    # 调用发送邮箱的函数
+
+from email import encoders
+from email.header import Header
+from email.mime.text import MIMEText
+from email.utils import parseaddr, formataddr
+import smtplib
+
+def _format_addr(s):
+    name, addr = parseaddr(s)
+    return formataddr((Header(name, 'utf-8').encode(), addr))
+
+from_addr = '826908021@qq.com'
+password = 'jtomjlibaioqbdch'
+to_addr = '799960740@qq.com'
+smtp_server = 'smtp.qq.com'
+
+msg = MIMEText('hello, send by Python...', 'plain', 'utf-8')
+msg['From'] = _format_addr('Python爱好者 <%s>' % from_addr)
+msg['To'] = _format_addr('管理员 <%s>' % to_addr)
+msg['Subject'] = Header('来自SMTP的问候……', 'utf-8').encode()
+
+server = smtplib.SMTP(smtp_server, 587)
+server.set_debuglevel(1)
+server.login(from_addr, password)
+server.sendmail(from_addr, [to_addr], msg.as_string())
+server.quit()
