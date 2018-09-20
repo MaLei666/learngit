@@ -311,22 +311,17 @@ class flattest():
 
         choose=input('是否继续发送？y/n： ')
         if choose=='n':
-            pass
             tcpclisocket.close()
+            return 0
 
         elif choose=='y':
             self.hzbj()
 
         while (KeyboardInterrupt, SystemExit):
             tcpclisocket.close()
+            return 0
 
 
 ceshi=flattest()
 ceshi.hzbj()
-
-
-
-
-
-
 

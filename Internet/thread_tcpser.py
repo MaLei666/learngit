@@ -7,20 +7,20 @@ from threading import Thread
 
 from socket import *
 from threading import Thread
-import binascii
+import binascii,re
 
 
 #处理客户端请求和数据
 def clideal(newsocket,cliaddr):
+    pattern = re.compile('.{1,2}')
     while True:
-
-        recvdata=newsocket.recv(1024)
-        if len(recvdata)>0:
-            print(str(cliaddr),recvdata)
-
-        recvdata=binascii.b2a_hex((newsocket.recv(1024)))
-        print(recvdata)
-        # print('连接', str(cliaddr))             # '\n',' '.join(pattern.findall(recvdata)))
+        #
+        # recvdata=newsocket.recv(1024)
+        # if len(recvdata)>0:
+        #     print(str(cliaddr),recvdata)
+        recvdata = binascii.b2a_hex(newsocket.recv(1024))
+        print('连接', str(cliaddr))             # '\n',' '.join(pattern.findall(recvdata)))
+        print('接收:', ' '.join(pattern.findall(str(recvdata))))
                                                 #pattern=re.compile('.{1,2}')
         if len(recvdata)>0:
             #切片
@@ -40,9 +40,9 @@ def clideal(newsocket,cliaddr):
             #print('校验和',checksum)
 
             # 返回值
-            sendhex=binascii.a2b_hex(startSign+sumdata+checksum+enddata)
-            print('返回',sendhex)
-            newsocket.send(sendhex)
+            sendhex=startSign+sumdata+checksum+enddata
+            print('返回:',' '.join(pattern.findall(str(sendhex))))
+            newsocket.send(binascii.a2b_hex(sendhex))
 
         else:
             print('close...')
@@ -81,6 +81,7 @@ def main():
             newsocket,cliaddr=tcpsersocket.accept()
             client=Thread(target=clideal,args=(newsocket,cliaddr))  #创建新的线程处理客户端数据
             client.start()
+
 
     finally:
         tcpsersocket.close()
