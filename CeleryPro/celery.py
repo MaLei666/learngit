@@ -2,11 +2,10 @@
 #-*- coding:utf-8 -*-
 # @author : MaLei 
 # @datetime : 2019-03-20 17:05
-# @file : celery_set.py
+# @file : celery.py
 # @software : PyCharm
 
-# from __future__ import absolute_import
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import   # absolute_import是绝对引入
 from celery import Celery
 
 app = Celery('CeleryPro',

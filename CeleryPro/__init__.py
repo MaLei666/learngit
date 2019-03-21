@@ -4,5 +4,3 @@
 # @datetime : 2019-03-19 17:00
 # @file : __init__.py.py
 # @software : PyCharm
-
-from celery import Celery
