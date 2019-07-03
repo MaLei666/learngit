@@ -8,9 +8,14 @@
 # for key, value in pairs:
 #     d[key].append(value)
 
-x = 1234.56789
-a=format(x, '0.2f')
-b=format(x, '>10.1f')
-c=format(x, ',')
-d=format(x, 'e')
-f=format(x, '0.2E')
+from collections import deque
+class linehistory:
+    def __init__(self, lines, histlen=3):
+        self.lines = lines
+        self.history = deque(maxlen=histlen)
+    def __iter__(self):
+        for lineno, line in enumerate(self.lines, 1):
+            self.history.append((lineno, line))
+            yield line
+    def clear(self):
+        self.history.clear()
