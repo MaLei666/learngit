@@ -9,13 +9,26 @@
 #     d[key].append(value)
 
 
-from functools import partial
-def spam(a, b, c, d):
-    print(a, b, c, d)
-
-s1 = partial(spam, 1)
-s2 = partial(spam, d=42)
-s3 = partial(spam, 1, 2, d=42)
+from queue import Queue
+from functools import wraps
+class Async:
+    def __init__(self, func, args):
+        self.func = func
+        self.args = args
+    def inlined_async(func):
+        @wraps(func)
+        def wrapper(*args):
+            f = func(*args)
+            result_queue = Queue()
+            result_queue.put(None)
+            while True:
+                result = result_queue.get()
+                try:
+                    a = f.send(result)
+                    apply_async(a.func, a.args, callback=result_queue.put)
+                except StopIteration:
+                    break
+        return wrapper
 
 
 
