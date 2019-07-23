@@ -8,36 +8,19 @@
 # for key, value in pairs:
 #     d[key].append(value)
 
+class Pair:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-from queue import Queue
-from functools import wraps
-class Async:
-    def __init__(self, func, args):
-        self.func = func
-        self.args = args
-    def inlined_async(func):
-        @wraps(func)
-        def wrapper(*args):
-            f = func(*args)
-            result_queue = Queue()
-            result_queue.put(None)
-            while True:
-                result = result_queue.get()
-                try:
-                    a = f.send(result)
-                    apply_async(a.func, a.args, callback=result_queue.put)
-                except StopIteration:
-                    break
-        return wrapper
+    def __repr__(self):
+        return 'Pair(%r, %r)' % (self.x, self.y)
+    def __str__(self):
+        return '({0.x!s}, {0.y!s})'.format(self)
 
-
-
-
-
-
-
-
-
-
-
+p=Pair(3, 4).__repr__()
+print(p)
+print('p is {0!r}'.format(p))
+def __repr__(self):
+    return 'Pair(%r, %r)' % (self.x, self.y)
 
