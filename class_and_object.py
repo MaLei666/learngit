@@ -447,6 +447,131 @@ class Descriptor:
 # def foo(self):
 # pass
 
+# class A:
+#     def spam(self, x):
+#         pass
+#     def foo(self):
+#         pass
+#
+# class B2:
+#     """ 使用__getattr__ 的代理，代理方法比较多时候"""
+#     def __init__(self):
+#         self._a = A()
+#     def bar(self):
+#         pass
+#     # Expose all of the methods defined on class A
+#     def __getattr__(self, name):
+#         """ 这个方法在访问的attribute 不存在的时候被调用
+#         the __getattr__() method is actually a fallback method
+#         that only gets called when an attribute is not found"""
+#         return getattr(self._a, name)
+
+# class Date:
+#     def __init__(self, year, month, day):
+#         self.year = year
+#         self.month = month
+#         self.day = day
+#
+# d = Date.__new__(Date)
+
+# class Connection1:
+#     """ 新方案——对每个状态定义一个类"""
+#     def __init__(self):
+#         self.new_state(ClosedConnectionState)
+#
+#     def new_state(self, newstate):
+#         self._state = newstate
+#
+#     # Delegate to the state class
+#     def read(self):
+#         return self._state.read(self)
+#
+#     def write(self, data):
+#         return self._state.write(self, data)
+#
+#     def open(self):
+#         return self._state.open(self)
+#
+#     def close(self):
+#         return self._state.close(self)
+#
+#     # Connection state base class
+# class ConnectionState:
+#     @staticmethod
+#     def read(conn):
+#         raise NotImplementedError()
+#
+#     @staticmethod
+#     def write(conn, data):
+#         raise NotImplementedError()
+#
+#     @staticmethod
+#     def open(conn):
+#         raise NotImplementedError()
+#
+#     @staticmethod
+#     def close(conn):
+#         raise NotImplementedError()
+#
+#     # Implementation of different states
+# class ClosedConnectionState(ConnectionState):
+#     @staticmethod
+#     def read(conn):
+#         raise RuntimeError('Not open')
+#
+#     @staticmethod
+#     def write(conn, data):
+#         raise RuntimeError('Not open')
+#
+#     @staticmethod
+#     def open(conn):
+#         conn.new_state(OpenConnectionState)
+#
+#     @staticmethod
+#     def close(conn):
+#         raise RuntimeError('Already closed')
+#
+# class OpenConnectionState(ConnectionState):
+#     @staticmethod
+#     def read(conn):
+#         print('reading')
+#
+#     @staticmethod
+#     def write(conn, data):
+#         print('writing')
+#
+#     @staticmethod
+#     def open(conn):
+#         raise RuntimeError('Already open')
+#
+#     @staticmethod
+#     def close(conn):
+#         conn.new_state(ClosedConnectionState)
+
+# d = getattr(p, 'distance')(0, 0) # Calls p.distance(0, 0)
+# import operator
+# operator.methodcaller('distance', 0, 0)(p)
+# points = [
+#     Point(1, 2),
+#     Point(3, 0),
+#     Point(10, -3),
+#     Point(-5, -7),
+#     Point(-1, 8),
+#     Point(3, 2)
+#     ]
+# #Sort by distance from origin (0, 0)
+# points.sort(key=operator.methodcaller('distance', 0, 0))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
