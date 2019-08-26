@@ -24,14 +24,14 @@ from bs4 import BeautifulSoup
 options=webdriver.ChromeOptions()
 options.add_argument('user-agent="Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"')
 browser=webdriver.Chrome(chrome_options=options)
-URL='http://xiaofang.safecity119.com/'
+URL='http://xxxx.com/'
 browser.get(URL)
 browser.maximize_window()   #把打开的浏览器最大化
 #登录
 elem1=browser.find_element_by_name('UName')
 elem2=browser.find_element_by_name('PWord')
-elem1.send_keys('bjzkadmin')
-elem2.send_keys('111111')
+elem1.send_keys('xxxx')
+elem2.send_keys('xxxx')
 elem1.send_keys(Keys.RETURN)
 sleep(3)
 #获取单位实时火警对应位置并点击进入
