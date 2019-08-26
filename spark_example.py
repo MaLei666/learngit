@@ -84,28 +84,41 @@ new_df_2=new_df.withColumn('alarm_time',date_format(new_df.alarm_time, 'yyyy-MM-
     .withColumn("dept_id", new_df["dept_id"].cast(IntegerType()))\
     .withColumn("unit_id", new_df["unit_id"].cast(IntegerType()))
 new_df_2.show()
-new_df_3=new_df_2.groupby('dev_id','dept_id','unit_id')
 
+# 按电量统计
 # 设备用电统计
-dev_electric_quantity=new_df_3.max('electric_quantity')\
+# new_df_3=new_df_2.groupby('dev_id','dept_id','unit_id')
+# dev_electric_quantity=new_df_3.max('electric_quantity')\
+#     .withColumnRenamed("max(electric_quantity)","electric_quantity")\
+#     .sort('electric_quantity',ascending=False)
+# dev_electric_quantity.show()
+#
+# # 单位用电统计
+# unit_electric_quantity=dev_electric_quantity.groupby('unit_id','dept_id')\
+#     .sum('electric_quantity')\
+#     .withColumnRenamed("sum(electric_quantity)","electric_quantity")
+# unit_electric_quantity=unit_electric_quantity.withColumn("electric_quantity",
+#                                                          unit_electric_quantity["electric_quantity"]
+#                                                          .cast(DecimalType(20,2))).sort('electric_quantity',ascending=False)
+# unit_electric_quantity.show()
+#
+# # 部门用电统计
+# dept_electric_quantity=unit_electric_quantity.groupby('dept_id')\
+#     .sum('electric_quantity')\
+#     .withColumnRenamed("sum(electric_quantity)","electric_quantity")\
+#     .sort('electric_quantity',ascending=False)
+# dept_electric_quantity.show()
+
+# 按时间做分类
+new_df_4=new_df_2.groupby('dev_id','unit_id','dept_id','alarm_time')
+date_electric_quantity=new_df_4.max('electric_quantity')\
     .withColumnRenamed("max(electric_quantity)","electric_quantity")
-dev_electric_quantity.show()
-
-# 单位用电统计
-unit_electric_quantity=dev_electric_quantity.groupby('unit_id','dept_id')\
+date_electric_quantity.show()
+date_electric_quantity_2=date_electric_quantity.groupby('unit_id','dept_id','alarm_time')\
     .sum('electric_quantity')\
     .withColumnRenamed("sum(electric_quantity)","electric_quantity")
-unit_electric_quantity=unit_electric_quantity.withColumn("electric_quantity",
-                                                         unit_electric_quantity["electric_quantity"]
-                                                         .cast(DecimalType(20,2)))
-unit_electric_quantity.show()
-
-# 部门用电统计
-dept_electric_quantity=unit_electric_quantity.groupby('dept_id')\
-    .sum('electric_quantity')\
-    .withColumnRenamed("sum(electric_quantity)","electric_quantity")
-dept_electric_quantity.show()
-
-
-
-
+# date_electric_quantity_2.show()
+date_electric_quantity_3=date_electric_quantity_2.withColumn("electric_quantity",
+                                                         date_electric_quantity_2["electric_quantity"]
+                                                         .cast(DecimalType(20,2))).sort('electric_quantity',ascending=False)
+date_electric_quantity_3.show()
