@@ -171,22 +171,23 @@ alarm_data_count=alarm_data_count.withColumn('alarm_hour_time',hour(alarm_data_c
 alarm_data_count.show()
 
 
-from pyspark.ml.classification import NaiveBayes
-from pyspark.ml import Pipeline
-from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler
-alarm_data_count=alarm_data_count.drop('alarm_time')
-old_columns_names = alarm_data_count.columns
-new_columns_names = [name+'-new' for name in old_columns_names]
-for i in range(len(old_columns_names)):
-    indexer = StringIndexer(inputCol=old_columns_names[i], outputCol=new_columns_names[i])
-    alarm_data_count = indexer.fit(alarm_data_count).transform(alarm_data_count)
-vecAss = VectorAssembler(inputCols=new_columns_names[1:], outputCol='features')
-alarm_data_count = vecAss.transform(alarm_data_count)
-# 更换label列名
-alarm_data_count = alarm_data_count.withColumnRenamed(new_columns_names[0], 'label')
-alarm_data_count.show()
-
-label_features = alarm_data_count.select(['label', 'features'])
+# from pyspark.ml.classification import NaiveBayes
+# from pyspark.ml import Pipeline
+# from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler
+# alarm_data_count=alarm_data_count.drop('alarm_time')
+# old_columns_names = alarm_data_count.columns
+# new_columns_names = [name+'-new' for name in old_columns_names]
+# for i in range(len(old_columns_names)):
+#     indexer = StringIndexer(inputCol=old_columns_names[i], outputCol=new_columns_names[i])
+#     alarm_data_count = indexer.fit(alarm_data_count).transform(alarm_data_count)
+# vecAss = VectorAssembler(inputCols=new_columns_names[1:], outputCol='features')
+# alarm_data_count = vecAss.transform(alarm_data_count)
+# # 更换label列名
+# alarm_data_count = alarm_data_count.withColumnRenamed(new_columns_names[0], 'label')
+# alarm_data_count.show()
+#
+# label_features = alarm_data_count.select(['label', 'features'])
+# train_data, test_data = label_features.randomSplit([4.0, 1.0], 100)
 
 # nb=NaiveBayes(smoothing=1.0)
 # model=nb.fit(alarm_data_count)
