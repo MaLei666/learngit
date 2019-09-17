@@ -131,7 +131,7 @@ files=files.read.csv("hdfs://192.168.1.108:9000/user/hadoop/tn_electric_history.
 # 创建新的dataframe
 new_df=files['dev_id','unit_id','dept_id','afci_information','line_overvoltage','line_undervoltage','line_overload','line_temperature','line_leakage','alarm_time']
 # new_df.show()
-new_df_2=new_df.withColumn('alarm_time',date_format(new_df.alarm_time, 'yyyy-MM-dd HH').cast(TimestampType()))\
+data=new_df.withColumn('alarm_time',date_format(new_df.alarm_time, 'yyyy-MM-dd HH').cast(TimestampType()))\
     .withColumn("afci_information", new_df["afci_information"].cast(IntegerType()))\
     .withColumn("line_overvoltage", new_df["line_overvoltage"].cast(IntegerType()))\
     .withColumn("line_undervoltage", new_df["line_undervoltage"].cast(IntegerType()))\
@@ -141,33 +141,30 @@ new_df_2=new_df.withColumn('alarm_time',date_format(new_df.alarm_time, 'yyyy-MM-
     .withColumn("dept_id", new_df["dept_id"].cast(IntegerType()))\
     .withColumn("unit_id", new_df["unit_id"].cast(IntegerType()))
 
-alarm_data=new_df_2
-#     .filter((new_df_2.afci_information==1)
-#                            |(new_df_2.line_overvoltage==1)
-#                            |(new_df_2.line_undervoltage==1)
-#                            |(new_df_2.line_overload==1)
-#                            |(new_df_2.line_temperature==1)
-#                            |(new_df_2.line_leakage==1))
-# alarm_data.show()
-
 # group_alarm_data=alarm_data.groupby('dev_id','unit_id','dept_id','afci_information','line_overvoltage',
 #                                     'line_undervoltage','line_overload','line_temperature','line_leakage','alarm_time').count()
-alarm_data_count=alarm_data.groupby('dev_id','unit_id','dept_id','alarm_time')\
-    .agg({'afci_information':'sum','line_overvoltage':'sum','line_undervoltage':'sum','line_overload':'sum','line_temperature':'sum','line_leakage':'sum'})\
+data_count=data.groupby('dev_id','unit_id','dept_id','alarm_time')\
+    .agg({'afci_information':'sum','line_overvoltage':'sum','line_undervoltage':'sum','line_overload':'sum','line_temperature':'sum','line_leakage':'sum','alarm_time':'count'})\
     .withColumnRenamed('sum(line_temperature)','temperature_count')\
     .withColumnRenamed('sum(line_overload)','overload_count')\
     .withColumnRenamed('sum(line_undervoltage)','undervoltage_count')\
     .withColumnRenamed('sum(line_leakage)','leakage_count')\
     .withColumnRenamed('sum(line_overvoltage)','overvoltage_count')\
-    .withColumnRenamed('sum(afci_information)','afci_info_count')
-alarm_data_count=alarm_data_count.withColumn('all_alarm_count',alarm_data_count['temperature_count']
-                                             +alarm_data_count['overload_count']
-                                             +alarm_data_count['undervoltage_count']
-                                             +alarm_data_count['leakage_count']
-                                             +alarm_data_count['overvoltage_count']
-                                             +alarm_data_count['afci_info_count'])
+    .withColumnRenamed('sum(afci_information)','afci_info_count')\
+    .withColumnRenamed('count(alarm_time)','all_info_count')
+alarm_data_count=data_count.withColumn('all_alarm_count',data_count['temperature_count']
+                                             +data_count['overload_count']
+                                             +data_count['undervoltage_count']
+                                             +data_count['leakage_count']
+                                             +data_count['overvoltage_count']
+                                             +data_count['afci_info_count'])
 # alarm_data_count.show()
-alarm_data_count=alarm_data_count.withColumn('alarm_hour_time',hour(alarm_data_count.alarm_time))
+alarm_data_count=alarm_data_count.withColumn('alarm_hour_time',hour(alarm_data_count.alarm_time))\
+    .filter((alarm_data_count.all_alarm_count>0))
+alarm_data_count.show()
+# print(alarm_data_count.dtypes)
+
+alarm_data_count=alarm_data_count.crosstab('dev_id','alarm_hour_time')
 alarm_data_count.show()
 
 
