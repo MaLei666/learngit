@@ -38,21 +38,84 @@
 # print(d._asdict())
 
 
-a=[1,2,3]
-b=[4,5,6]
-c=[7,8,9]
+# a=[1,2,3]
+# b=[4,5,6]
+# c=[7,8,9]
+#
+# a2=(1,2,3)
+# b2=(4,5,6)
+# c2=(7,8,9)
+#
+# a.__iadd__(b)
+# d=b.__add__(c)
+# print(a,d)
+# a.extend(c)
+# print(a)
+#
+# d2=a2.__add__(b2)
+# print(d2)
+# c.extend(c2)
+# print(c)
 
-a2=(1,2,3)
-b2=(4,5,6)
-c2=(7,8,9)
+#错误
+# a= [['a','b']*2] * 3
+# print(a)
+# #列表内的 3 个引用指向同一个对象
+# a[1][1]='c'  #三个元素都变了
+# print(a,'\n')
+#
+# #正确
+# # 每次迭代中都新建了一个列表，作为新的一行追加到list
+# a=[['a','b'] *2 for i in range(3)]
+# print(a)
+# a[1][1]='c'
+# print(a)
 
-a.__iadd__(b)
-d=b.__add__(c)
-print(a,d)
-a.extend(c)
-print(a)
+# a=['a','1']
+# b=['b']
+# c=('c')
+# d='de'
+# a+=b
+# print(a)
+# a+=c
+# print(a)
+# a+=d
+# print(a)
 
-d2=a2.__add__(b2)
-print(d2)
-c.extend(c2)
-print(c)
+# a=['a','Ac']
+# a.sort(key=len)
+# print(a)
+# a.sort(key=str.lower,reverse=True)
+# print(a)
+
+# import bisect
+#
+# # HAYSTACK = [1, 4, 5, 6, 8, 12, 15, 20, 21, 23, 23, 26, 29, 30]
+# # NEEDLES = [0, 1, 2, 5, 8, 10, 22, 23, 29, 30, 31]
+# # for i in NEEDLES:
+# #     a = bisect.bisect(HAYSTACK, i)
+# #     print(a)
+# a=[60, 70, 80, 90]
+# def grade(score, breakpoints=[60, 70, 80, 90], grades='FDCBA'):
+#     i = bisect.bisect(breakpoints, score)
+#     return grades[i]
+#
+# for score in [33, 99, 77, 70, 89, 90, 100]:
+#     print(grade(score))
+#     bisect.insort(a,score)
+# print(a)
+
+from collections import deque
+dq=deque(range(10),maxlen=10)
+dq.rotate(-5)
+print(dq)
+dq.rotate(5)
+print(dq)
+dq.append('a')
+print(dq)
+dq.extend(['a'])
+print(dq)
+dq.extendleft(('a','b'))
+print(dq)
+# dq.append('a')
+# print(dq)
