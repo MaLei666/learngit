@@ -24,7 +24,7 @@
 # def __repr__(self):
 #     return 'Pair(%r, %r)' % (self.x, self.y)
 
-#collections.namedtuple 是一个工厂函数，它可以用来构建一个带 字段名的元组和一个有名字的类
+# collections.namedtuple 是一个工厂函数，它可以用来构建一个带 字段名的元组和一个有名字的类
 # 创建一个具名元组需要两个参数，一个是类名，另一个是类的各个 字段的名字。
 # 后者可以是由数个字符串组成的可迭代对象，或者是由空 格分隔开的字段名组成的字符串
 # from collections import namedtuple
@@ -57,7 +57,7 @@
 # c.extend(c2)
 # print(c)
 
-#错误
+# 错误
 # a= [['a','b']*2] * 3
 # print(a)
 # #列表内的 3 个引用指向同一个对象
@@ -136,36 +136,44 @@
 # print(' str :', re_words_str.findall(text_str))
 # print(' bytes:', re_words_bytes.findall(text_bytes))
 
+# 元组的相对不可变性
+# t1 = (1, 2, [30, 40])  # t1 不可变，但是 t1[-1] 可变
+# t2 = (1, 2, [30, 40])
+# print(t1 == t2)
+# print(id(t1), id(t2))
+# print(t1 is t2)  # 是不同对象，但是值相等
+#
+# print(id(t1[-1]))
+# t1[-1].append(99)
+# print(t1 == t2)
+# print(id(t1[-1]))
 
 
+# 构造方法或 [:] 做的是浅复制（即复制了最外层容器，副本中的元素是源容器中元素的引用）
+# 如果所有元素都是不可变的，那么这 样没有问题，还能节省内存
+# l1 = [3, [66, 55, 44], (7, 8, 9)]
+# l2 = list(l1)
+# l1.append(100)
+# l1[1].remove(55)
+# print('l1:', l1)
+# print('l2:', l2)
+# l2[1] += [33, 22]
+# l2[2] += (10, 11)
+# print('l1:', l1)
+# print('l2:', l2)
 
 
+# a = [10, 20]
+# b = [a, 30]
+# a.append(b)
+# from copy import deepcopy
+# c = deepcopy(a)
+# print(c)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# del 不删除对象，而是删除对象的引用。
+# 执行 del 操作后 可能会导致对象不可获取，从而被删除
+a = [1, 3, 4]
+b = a
+del a
+print(b)
+print(a)
