@@ -172,8 +172,13 @@
 
 # del 不删除对象，而是删除对象的引用。
 # 执行 del 操作后 可能会导致对象不可获取，从而被删除
-a = [1, 3, 4]
-b = a
-del a
-print(b)
-print(a)
+# a = [1, 3, 4]
+# b = a
+# del a
+# print(b)
+# print(a)
+import json
+a=dict({'1':1,"2":2,'eeee':[]})
+# print(a.get('eeee'))
+for i in ['1','2','3']:
+    print(a.get(i))
