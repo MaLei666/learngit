@@ -143,7 +143,6 @@ class Vector5(Vector4):
         return self * scalar
 
 
-
 # v1 = Vector5([1, 2, 3])
 # print(v1 * 10)
 # print(v1 * Fraction(1, 3))
@@ -152,12 +151,12 @@ class Vector5(Vector4):
 '''
 增量赋值运算符
 '''
-#增量赋值不会修改不可变目标，而是新建实例，然后重新绑定
+# 增量赋值不会修改不可变目标，而是新建实例，然后重新绑定
 v1 = Vector5([1, 2, 3])
 print(id(v1))
-v1+=Vector5([2,3,4])
+v1 += Vector5([2, 3, 4])
 print(v1)
-#v1重新绑定了新的id实例
+# v1重新绑定了新的id实例
 print(id(v1))
 
-print(issubclass(Vector5,Vector))
+print(issubclass(Vector5, Vector))
