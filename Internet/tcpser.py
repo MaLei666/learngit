@@ -2,22 +2,32 @@
 from socket import *
 from multiprocessing import *
 from time import sleep
-
-# #单进程服务器
+from datetime import datetime
+# # #单进程服务器
 tcpsersocket=socket(AF_INET,SOCK_STREAM)
 tcpsersocket.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
-bindaddr=('192.168.1.174',8890)
+bindaddr=('127.0.0.1',8081)
 tcpsersocket.bind(bindaddr)
 tcpsersocket.listen(5)
 while True:
-    print('waiting...')
     newsocket,cliaddr=tcpsersocket.accept()
-    print('%s data:'%str(cliaddr))
     try:
         while True:
             recvdata=newsocket.recv(1024)
-            if len(recvdata)>0:
-                print(str(cliaddr),recvdata)
+            if recvdata:
+                recvdata=recvdata.decode()
+                if len(recvdata.split('T'))>1:
+                    recvdata=recvdata.replace('T',' ')
+                    time_str=datetime.strptime(recvdata,'%Y-%m-%d %H:%M:%S')
+                    if time_str>datetime.now():
+                        newsocket.send(bytes('时间晚于当前时间',encoding='utf-8'))
+                    else:
+                        week=time_str.weekday()+1
+                        days=(datetime.now()-time_str).days
+                        newsocket.send(bytes('星期{},距离当前还有{}天'.format(week,days),encoding='utf-8'))
+                else:
+                    newsocket.send(bytes('时间格式不正确',encoding='utf-8'))
+                print(recvdata)
             else:
                 print('closed...')
             break
@@ -36,10 +46,12 @@ while True:
 #     newsocket.close()
 #
 #
+
+
 # def main():
 #     tcpsersocket=socket(AF_INET,SOCK_STREAM)
 #     tcpsersocket.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
-#     tcpaddr=('192.168.43.51',8001)
+#     tcpaddr=('127.0.0.1',8081)
 #     tcpsersocket.bind(tcpaddr)
 #     tcpsersocket.listen(5)
 #
@@ -53,9 +65,9 @@ while True:
 #             newsocket.close()
 #     finally:
 #         tcpsersocket.close()
-
-if __name__=='__main__':
-    main()
+#
+# if __name__=='__main__':
+#     main()
 
 
 
