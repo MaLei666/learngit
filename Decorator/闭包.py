@@ -34,3 +34,19 @@
 # print(a(13))
 # print(a(22))
 # print(a(21))
+
+# def make_adder(addend):
+#     def adder(augend):
+#         return augend + addend
+#     return adder
+#
+# p = make_adder(23)
+# q = make_adder(44)
+#
+# print (p(100))
+# print (q(100))
+#
+# import sys
+# print(sys.path)
+
+print(frozenset([0,0]))
